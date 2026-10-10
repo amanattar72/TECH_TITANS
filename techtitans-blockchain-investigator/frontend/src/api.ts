@@ -1,0 +1,4 @@
+import type {CaseRecord, Investigation} from './types';
+const BASE=import.meta.env.VITE_API_BASE_URL || 'http://localhost:8000';
+async function request<T>(path:string, init?:RequestInit):Promise<T>{const r=await fetch(BASE+path,{...init,headers:{'Content-Type':'application/json',...(init?.headers||{})}});if(!r.ok){let message=`Request failed (${r.status})`;try{const body=await r.json();message=body.detail||message}catch{}throw new Error(message)}return r.json()}
+export const api={investigate:(address:string,network:string,mode:string)=>request<Investigation>('/api/investigations',{method:'POST',body:JSON.stringify({address,network,mode})}),cases:()=>request<CaseRecord[]>('/api/cases'),createCase:(data:Partial<CaseRecord>)=>request<CaseRecord>('/api/cases',{method:'POST',body:JSON.stringify(data)}),updateCase:(id:string,data:Partial<CaseRecord>)=>request<CaseRecord>(`/api/cases/${id}`,{method:'PATCH',body:JSON.stringify(data)}),base:BASE};
